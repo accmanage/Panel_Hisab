@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Futuristic Panel</title>
+<title>Excel Panel</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -50,7 +50,6 @@ h3 input {
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 6px;
 }
 
 td, th {
@@ -58,7 +57,6 @@ td, th {
   padding: 10px;
   font-size: 13px;
   text-align: center;
-  overflow: visible;
 }
 
 th {
@@ -78,26 +76,33 @@ th {
   border-top: 2px solid rgba(79,195,255,0.4);
 }
 
-/* Normal Inputs */
+/* Normal inputs */
 .auto-input {
   width: 100%;
   border: none;
   background: transparent;
   color: #4fc3ff;
   text-align: center;
-  font-weight: 600;
 }
 
-/* ✅ WRAP ONLY SITE & ID */
-.wrap-input {
+/* ✅ SMART INPUT (SITE & ID) */
+.smart-input {
   width: 100%;
+  max-width: 15ch;
+
   border: none;
   background: transparent;
   color: #4fc3ff;
-  text-align: left;
-  font-weight: 600;
+
+  resize: none;
+  overflow: hidden;
+
   white-space: normal;
   word-break: break-word;
+
+  text-align: left;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 /* Share row */
@@ -105,7 +110,6 @@ th {
   display: flex;
   justify-content: center;
   gap: 6px;
-  white-space: nowrap;
 }
 
 .percent-input {
@@ -132,8 +136,8 @@ input[type="date"] {
 /* Button */
 .download-btn {
   width: 100%;
-  padding: 12px;
   margin-top: 14px;
+  padding: 12px;
   border-radius: 10px;
   background: linear-gradient(90deg, #4fc3ff, #6a82fb);
   color: white;
@@ -172,8 +176,8 @@ input[type="date"] {
 
 <tr>
 <td>1</td>
-<td><input id="site" class="wrap-input"></td>
-<td><input id="id" class="wrap-input"></td>
+<td><textarea id="site" class="smart-input"></textarea></td>
+<td><textarea id="id" class="smart-input"></textarea></td>
 <td><input id="settling" class="auto-input" value="0"></td>
 </tr>
 
@@ -192,8 +196,7 @@ input[type="date"] {
 <tr>
 <td colspan="3" class="label">
   <div class="share-row">
-    SHARE @ 
-    <input id="percent" class="percent-input" value="70">%
+    SHARE @ <input id="percent" class="percent-input" value="">%
   </div>
 </td>
 <td id="share"></td>
@@ -226,6 +229,18 @@ input[type="date"] {
 </div>
 
 <script>
+// Auto height for SITE & ID
+function autoHeight(el) {
+  el.style.height = "auto";
+  el.style.height = el.scrollHeight + "px";
+}
+
+["site", "id"].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener("input", () => autoHeight(el));
+});
+
+// Calculation
 function applyColor(el, value) {
   let target = el.tagName === "INPUT" ? el.parentElement : el;
   target.classList.remove("positive", "negative");
@@ -235,38 +250,35 @@ function applyColor(el, value) {
 }
 
 function calc() {
-  let settlingEl = document.getElementById("settling");
-  let holdEl = document.getElementById("hold");
-  let totalEl = document.getElementById("total");
-  let finalEl = document.getElementById("final");
+  let settlingVal = +document.getElementById("settling").value || 0;
+  let holdVal = +document.getElementById("hold").value || 0;
+  let percentVal = +document.getElementById("percent").value || 0;
+  let rcvdVal = +document.getElementById("rcvd").value || 0;
+  let prevVal = +document.getElementById("prev").value || 0;
+  let openingVal = +document.getElementById("opening").value || 0;
 
-  let settling = +settlingEl.value || 0;
-  let hold = +holdEl.value || 0;
-  let percent = +document.getElementById("percent").value || 0;
-  let rcvd = +document.getElementById("rcvd").value || 0;
-  let prev = +document.getElementById("prev").value || 0;
-  let opening = +document.getElementById("opening").value || 0;
+  let totalVal = settlingVal + holdVal;
+  let shareVal = settlingVal * (percentVal / 100);
+  let finalVal = prevVal + openingVal - rcvdVal + shareVal;
 
-  let total = settling + hold;
-  let share = settling * (percent / 100);
-  let final = prev + opening - rcvd + share;
+  document.getElementById("total").innerText = totalVal.toFixed(2);
+  document.getElementById("share").innerText = shareVal.toFixed(2);
+  document.getElementById("final").innerText = finalVal.toFixed(2);
 
-  totalEl.innerText = total.toFixed(2);
-  document.getElementById("share").innerText = share.toFixed(2);
-  finalEl.innerText = final.toFixed(2);
-
-  applyColor(settlingEl, settling);
-  applyColor(holdEl, hold);
-  applyColor(totalEl, total);
-  applyColor(finalEl, final);
+  applyColor(document.getElementById("settling"), settlingVal);
+  applyColor(document.getElementById("hold"), holdVal);
+  applyColor(document.getElementById("total"), totalVal);
+  applyColor(document.getElementById("final"), finalVal);
 }
 
+// Bind inputs
 document.querySelectorAll("input").forEach(i => {
   i.addEventListener("input", calc);
 });
 
 calc();
 
+// Download
 function downloadImage() {
   html2canvas(document.getElementById("capture"), {
     scale: 3,
