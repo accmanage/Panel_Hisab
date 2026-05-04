@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Excel Mobile Fit</title>
+<title>Futuristic Panel</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -11,35 +11,38 @@
 * { box-sizing: border-box; }
 
 body {
-  font-family: Arial;
   margin: 0;
-  background: #f0f0f0;
-  padding-bottom: 70px;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #141e30, #243b55);
+  display: flex;
+  justify-content: center;
 }
 
-/* Main container */
+/* Card */
 .sheet {
-  width: 100%;
-  height: 100vh;
-  background: white;
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
+  width: 95%;
+  max-width: 500px;
+  margin-top: 12px;
+  padding: 18px; /* FIXED */
+  border-radius: 18px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 35px rgba(0,150,255,0.25);
+  color: white;
 }
 
 /* Header */
 h3 {
   text-align: center;
   font-size: 14px;
-  margin: 5px 0;
 }
 
 h3 input {
   border: none;
-  font-size: 14px;
+  background: transparent;
+  color: #4fc3ff;
   font-weight: bold;
   text-align: center;
-  background: transparent;
   width: 90px;
 }
 
@@ -47,30 +50,32 @@ h3 input {
 table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  margin-top: 6px;
 }
 
 td, th {
-  border: 1px solid #333;
-  padding: 6px;
-  font-size: 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 10px; /* FIXED */
+  font-size: 13px;
   text-align: center;
+  overflow: visible; /* FIXED */
 }
 
 th {
-  background: #2f5d50;
-  color: white;
+  background: rgba(0,150,255,0.2);
+  color: #4fc3ff;
 }
 
 .label {
-  background: #d8caa6;
+  background: rgba(255,255,255,0.08);
   font-weight: bold;
-  white-space: nowrap;
 }
 
 .final {
-  background: yellow;
+  background: rgba(255,255,255,0.08);
+  color: #4fc3ff;
   font-weight: bold;
+  border-top: 2px solid rgba(79,195,255,0.4);
 }
 
 /* Inputs */
@@ -78,45 +83,55 @@ th {
   width: 100%;
   border: none;
   background: transparent;
+  color: #4fc3ff;
   text-align: center;
-  font-size: 12px;
-}
-
-/* SHARE row fix */
-.share-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  white-space: nowrap;
+  font-weight: 600;
 }
 
 .percent-input {
-  width: 35px;
+  width: 40px;
   border: none;
   background: transparent;
-  text-align: center;
+  color: #4fc3ff;
   font-weight: bold;
+  text-align: center;
 }
 
-/* Colors */
+/* Share row */
+.share-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+/* Date */
+input[type="date"] {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  padding: 4px 6px;
+  border-radius: 6px;
+  color: white;
+}
+
+/* Value colors */
 .positive {
-  background: #b7e1b0 !important;
+  background: rgba(0,255,100,0.25) !important;
 }
 
 .negative {
-  background: #f4b4b4 !important;
+  background: rgba(255,0,0,0.25) !important;
 }
 
 /* Button */
 .download-btn {
-  position: fixed;
-  bottom: 0;
   width: 100%;
   padding: 12px;
-  font-size: 14px;
-  background: #2f5d50;
+  margin-top: 14px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #4fc3ff, #6a82fb);
   color: white;
+  font-weight: bold;
   border: none;
 }
 </style>
@@ -134,6 +149,13 @@ th {
 </h3>
 
 <table>
+
+<tr>
+<td colspan="4" style="text-align:right;">
+  DATE :
+  <input type="date" id="date">
+</td>
+</tr>
 
 <tr>
 <th>SR</th>
@@ -164,8 +186,8 @@ th {
 <tr>
 <td colspan="3" class="label">
   <div class="share-row">
-    OUR SHARE @
-    <input id="percent" class="percent-input" value="0">%
+    SHARE @ 
+    <input id="percent" class="percent-input" value="70">%
   </div>
 </td>
 <td id="share"></td>
@@ -192,22 +214,20 @@ th {
 </tr>
 
 </table>
-</div>
 
 <button class="download-btn" onclick="downloadImage()">Download</button>
 
+</div>
+
 <script>
-// Color Logic
 function applyColor(el, value) {
   let target = el.tagName === "INPUT" ? el.parentElement : el;
-
   target.classList.remove("positive", "negative");
 
   if (value > 0) target.classList.add("positive");
   else if (value < 0) target.classList.add("negative");
 }
 
-// Calculation
 function calc() {
   let settlingEl = document.getElementById("settling");
   let holdEl = document.getElementById("hold");
@@ -235,19 +255,27 @@ function calc() {
   applyColor(finalEl, final);
 }
 
-// Events
 document.querySelectorAll("input").forEach(i => {
   i.addEventListener("input", calc);
 });
 
 calc();
 
-// Download
+/* FIXED EXPORT */
 function downloadImage() {
-  html2canvas(document.getElementById("capture"), { scale: 2 }).then(canvas => {
+  const element = document.getElementById("capture");
+
+  html2canvas(element, {
+    scale: 3,
+    backgroundColor: null,
+    scrollX: 0,
+    scrollY: -window.scrollY,
+    windowWidth: document.body.scrollWidth,
+    windowHeight: document.body.scrollHeight
+  }).then(canvas => {
     let link = document.createElement("a");
     link.download = "sheet.png";
-    link.href = canvas.toDataURL();
+    link.href = canvas.toDataURL("image/png");
     link.click();
   });
 }
