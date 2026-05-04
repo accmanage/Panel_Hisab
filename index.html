@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Excel UI Pro</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+body {
+  font-family: Arial;
+  background: #f0f0f0;
+  text-align: center;
+}
+
+.sheet {
+  display: inline-block;
+  background: white;
+  padding: 20px;
+  position: relative;
+}
+
+/* Header inputs */
+h3 input {
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  background: transparent;
+}
+
+/* Table */
+table {
+  border-collapse: collapse;
+}
+
+td, th {
+  border: 1px solid #333;
+  padding: 10px;
+  min-width: 160px;
+}
+
+th {
+  background: #2f5d50;
+  color: white;
+}
+
+.label {
+  background: #d8caa6;
+  font-weight: bold;
+}
+
+.final {
+  background: yellow;
+  font-weight: bold;
+}
+
+/* Inputs */
+.auto-input {
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-size: 14px;
+  min-width: 40px;
+}
+
+.percent-box {
+  font-weight: bold;
+  font-size: 16px;
+  width: 45px;
+}
+
+/* Hidden span for measuring */
+.measure-span {
+  position: absolute;
+  visibility: hidden;
+  white-space: pre;
+  font-family: Arial;
+  font-size: 14px;
+}
+
+button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: #2f5d50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="sheet" id="capture">
+
+<h3>
+  GROUP :
+  <input id="group" class="auto-input" value="">
+  |
+  <input id="name" class="auto-input" value="">
+</h3>
+
+<table>
+
+<tr>
+<th>SR</th>
+<th>SITE</th>
+<th>ID</th>
+<th>SETTLING</th>
+</tr>
+
+<tr>
+<td>1</td>
+<td><input id="site" class="auto-input" value=""></td>
+<td><input id="id" class="auto-input" value=""></td>
+<td><input id="settling" class="auto-input" value="0"></td>
+</tr>
+
+<tr><td colspan="4"></td></tr>
+
+<tr>
+<td colspan="3" class="label">HOLD BALANCE</td>
+<td><input id="hold" class="auto-input" value="0"></td>
+</tr>
+
+<tr>
+<td colspan="3" class="label">TOTAL</td>
+<td id="total"></td>
+</tr>
+
+<tr>
+<td colspan="3" class="label">
+  OUR SHARE @
+  <input id="percent" class="auto-input percent-box" value="70">%
+</td>
+<td id="share"></td>
+</tr>
+
+<tr>
+<td colspan="3" class="label">RCVD THIS WEEK</td>
+<td><input id="rcvd" class="auto-input" value="0"></td>
+</tr>
+
+<tr>
+<td colspan="3" class="label">PREVIOUS BALANCE</td>
+<td><input id="prev" class="auto-input" value="0"></td>
+</tr>
+
+<tr>
+<td colspan="3" class="label">OPENING PUNT BAL</td>
+<td><input id="opening" class="auto-input" value="0"></td>
+</tr>
+
+<tr>
+<td colspan="3" class="final">FINAL</td>
+<td class="final" id="final"></td>
+</tr>
+
+</table>
+</div>
+
+<button onclick="downloadImage()">Download Image</button>
+
+<script>
+// ===== Auto Resize Logic =====
+const measure = document.createElement("span");
+measure.className = "measure-span";
+document.body.appendChild(measure);
+
+function autoResize(input) {
+  measure.style.font = window.getComputedStyle(input).font;
+  measure.textContent = input.value || " ";
+  input.style.width = (measure.offsetWidth + 12) + "px";
+}
+
+document.querySelectorAll(".auto-input").forEach(input => {
+  autoResize(input);
+  input.addEventListener("input", () => {
+    autoResize(input);
+    calc();
+  });
+});
+
+// ===== Calculation Logic =====
+function calc() {
+  let settling = +document.getElementById("settling").value || 0;
+  let hold = +document.getElementById("hold").value || 0;
+  let percent = +document.getElementById("percent").value || 0;
+  let rcvd = +document.getElementById("rcvd").value || 0;
+  let prev = +document.getElementById("prev").value || 0;
+  let opening = +document.getElementById("opening").value || 0;
+
+  let total = settling + hold;
+  let share = total * (percent / 100);
+  let final = prev + opening + rcvd + share;
+
+  document.getElementById("total").innerText = total.toFixed(2);
+  document.getElementById("share").innerText = share.toFixed(2);
+  document.getElementById("final").innerText = final.toFixed(2);
+}
+
+calc();
+
+// ===== Download =====
+function downloadImage() {
+  html2canvas(document.getElementById("capture")).then(canvas => {
+    let link = document.createElement("a");
+    link.download = "sheet.png";
+    link.href = canvas.toDataURL();
+    link.click();
+  });
+}
+</script>
+
+</body>
+</html>
