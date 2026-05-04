@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Excel Panel</title>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<title>Clean Panel</title>
 
 <style>
 * { box-sizing: border-box; }
@@ -18,12 +16,11 @@ body {
   justify-content: center;
 }
 
-/* Card */
 .sheet {
   width: 95%;
   max-width: 500px;
   margin-top: 12px;
-  padding: 18px;
+  padding: 12px;
   border-radius: 18px;
   background: rgba(255,255,255,0.05);
   backdrop-filter: blur(12px);
@@ -31,16 +28,37 @@ body {
   color: white;
 }
 
-/* Table */
-table {
-  width: 100%;
-  border-collapse: collapse;
+/* 🔥 HEADER FIX ONLY */
+h3 {
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 10px;
 }
 
+.header-input {
+  width: 90px; /* fixed width */
+  border: none;
+  background: transparent;
+  color: #4fc3ff;
+  text-align: center;
+  font-weight: bold;
+  outline: none;
+}
+#date {
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: #4fc3ff;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 12px;
+  outline: none;
+}
+
+/* cells */
 td, th {
   border: 1px solid rgba(255,255,255,0.15);
-  padding: 10px;
-  font-size: 13px;
+  padding: 6px;
+  font-size: 12px;
   text-align: center;
 }
 
@@ -60,7 +78,7 @@ th {
   font-weight: bold;
 }
 
-/* Inputs */
+/* inputs */
 .auto-input {
   width: 100%;
   border: none;
@@ -69,56 +87,62 @@ th {
   text-align: center;
 }
 
-/* TEXTAREA (input mode) */
-.smart-input {
-  width: 100%;
-  max-width: 13ch;
+.percent-box {
+  width: 45px;
   border: none;
   background: transparent;
   color: #4fc3ff;
+  text-align: center;
+}
+
+/* TEXTAREA */
+.smart-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: #4fc3ff;
+
   resize: none;
   overflow: hidden;
+
   text-align: left;
+
+  white-space: pre-wrap;      /* ✅ allow wrapping */
+  word-break: break-word;     /* ✅ break long text */
+  overflow-wrap: break-word;  /* ✅ clean wrap */
+
+  font-size: 12px;
 }
 
-/* DISPLAY TEXT (capture mode) */
-.display-text {
-  display: none;
-  white-space: pre-wrap;
-  word-break: break-word;
-  color: #4fc3ff;
-  text-align: left;
-  font-weight: 600;
+/* colors */
+.positive {
+  background: rgba(0,255,100,0.25) !important;
 }
 
-/* Switch modes */
-.capture-mode textarea {
-  display: none;
-}
-.capture-mode .display-text {
-  display: block;
-}
-
-/* Button */
-.download-btn {
-  width: 100%;
-  margin-top: 14px;
-  padding: 12px;
-  border-radius: 10px;
-  background: linear-gradient(90deg, #4fc3ff, #6a82fb);
-  color: white;
-  font-weight: bold;
-  border: none;
+.negative {
+  background: rgba(255,0,0,0.25) !important;
 }
 </style>
 </head>
 
 <body>
 
-<div class="sheet" id="capture">
+<div class="sheet">
+
+<h3>
+  GROUP :
+  <input id="group" class="header-input" value="">
+  |
+  <input id="name" class="header-input" value="">
+</h3>
 
 <table>
-
+<colgroup>
+  <col style="width:5%">   <!-- SR -->
+  <col style="width:32%">  <!-- SITE -->
+  <col style="width:32%">  <!-- ID -->
+  <col style="width:31%">  <!-- SETTLING -->
+</colgroup>
 <tr>
 <td colspan="4" style="text-align:right;">
   DATE :
@@ -135,17 +159,8 @@ th {
 
 <tr>
 <td>1</td>
-
-<td>
-  <textarea id="siteInput" class="smart-input"></textarea>
-  <div id="siteDisplay" class="display-text"></div>
-</td>
-
-<td>
-  <textarea id="idInput" class="smart-input"></textarea>
-  <div id="idDisplay" class="display-text"></div>
-</td>
-
+<td><textarea id="site" class="smart-input"></textarea></td>
+<td><textarea id="id" class="smart-input"></textarea></td>
 <td><input id="settling" class="auto-input" value="0"></td>
 </tr>
 
@@ -162,12 +177,15 @@ th {
 </tr>
 
 <tr>
-<td colspan="3" class="label">SHARE @ 70%</td>
+<td colspan="3" class="label">
+  OUR SHARE @ 
+  <input id="percent" class="percent-box" value="0">%
+</td>
 <td id="share"></td>
 </tr>
 
 <tr>
-<td colspan="3" class="label">RCVD THIS WEEK</td>
+<td colspan="3" class="label">RECEIVED THIS WEEK</td>
 <td><input id="rcvd" class="auto-input" value="0"></td>
 </tr>
 
@@ -177,7 +195,7 @@ th {
 </tr>
 
 <tr>
-<td colspan="3" class="label">OPENING PUNT BAL</td>
+<td colspan="3" class="label">OPENING PUNTER BALANCE</td>
 <td><input id="opening" class="auto-input" value="0"></td>
 </tr>
 
@@ -188,68 +206,54 @@ th {
 
 </table>
 
-<button class="download-btn" onclick="downloadImage()">Download</button>
-
 </div>
 
 <script>
-// Sync textarea → display div
-function sync(inputId, displayId) {
-  const input = document.getElementById(inputId);
-  const display = document.getElementById(displayId);
+// Color helper
+function applyColor(el, value) {
+  let target = el.tagName === "INPUT" ? el.parentElement : el;
 
-  input.addEventListener("input", () => {
-    display.innerText = input.value;
+  target.classList.remove("positive", "negative");
 
-    input.style.height = "auto";
-    input.style.height = input.scrollHeight + "px";
-  });
+  if (value > 0) target.classList.add("positive");
+  else if (value < 0) target.classList.add("negative");
 }
-
-sync("siteInput", "siteDisplay");
-sync("idInput", "idDisplay");
 
 // Calculation
 function calc() {
-  let settling = +document.getElementById("settling").value || 0;
-  let hold = +document.getElementById("hold").value || 0;
+  let settlingEl = document.getElementById("settling");
+  let holdEl = document.getElementById("hold");
+  let totalEl = document.getElementById("total");
+  let finalEl = document.getElementById("final");
+  let shareEl = document.getElementById("share");
+
+  let settling = +settlingEl.value || 0;
+  let hold = +holdEl.value || 0;
+  let percent = +document.getElementById("percent").value || 0;
   let rcvd = +document.getElementById("rcvd").value || 0;
   let prev = +document.getElementById("prev").value || 0;
   let opening = +document.getElementById("opening").value || 0;
 
   let total = settling + hold;
-  let share = settling * 0.7;
+  let share = settling * (percent / 100);
   let final = prev + opening - rcvd + share;
 
-  document.getElementById("total").innerText = total.toFixed(2);
-  document.getElementById("share").innerText = share.toFixed(2);
-  document.getElementById("final").innerText = final.toFixed(2);
+  totalEl.innerText = total.toFixed(2);
+  shareEl.innerText = share.toFixed(2);
+  finalEl.innerText = final.toFixed(2);
+
+  applyColor(settlingEl, settling);
+  applyColor(holdEl, hold);
+  applyColor(totalEl, total);
+  applyColor(finalEl, final);
 }
 
+// Bind inputs
 document.querySelectorAll("input").forEach(i => {
   i.addEventListener("input", calc);
 });
 
 calc();
-
-// Download as JPEG (NO CUT)
-function downloadImage() {
-  const element = document.getElementById("capture");
-
-  element.classList.add("capture-mode");
-
-  html2canvas(element, {
-    scale: 3,
-    backgroundColor: "#ffffff"
-  }).then(canvas => {
-    const link = document.createElement("a");
-    link.download = "sheet.jpg";
-    link.href = canvas.toDataURL("image/jpeg", 0.95);
-    link.click();
-
-    element.classList.remove("capture-mode");
-  });
-}
 </script>
 
 </body>
