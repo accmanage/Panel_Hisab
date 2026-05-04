@@ -23,7 +23,7 @@ body {
   width: 95%;
   max-width: 500px;
   margin-top: 12px;
-  padding: 18px; /* FIXED */
+  padding: 18px;
   border-radius: 18px;
   background: rgba(255,255,255,0.05);
   backdrop-filter: blur(12px);
@@ -55,10 +55,10 @@ table {
 
 td, th {
   border: 1px solid rgba(255,255,255,0.15);
-  padding: 10px; /* FIXED */
+  padding: 10px;
   font-size: 13px;
   text-align: center;
-  overflow: visible; /* FIXED */
+  overflow: visible;
 }
 
 th {
@@ -78,7 +78,7 @@ th {
   border-top: 2px solid rgba(79,195,255,0.4);
 }
 
-/* Inputs */
+/* Normal Inputs */
 .auto-input {
   width: 100%;
   border: none;
@@ -88,13 +88,16 @@ th {
   font-weight: 600;
 }
 
-.percent-input {
-  width: 40px;
+/* ✅ WRAP ONLY SITE & ID */
+.wrap-input {
+  width: 100%;
   border: none;
   background: transparent;
   color: #4fc3ff;
-  font-weight: bold;
-  text-align: center;
+  text-align: left;
+  font-weight: 600;
+  white-space: normal;
+  word-break: break-word;
 }
 
 /* Share row */
@@ -103,6 +106,14 @@ th {
   justify-content: center;
   gap: 6px;
   white-space: nowrap;
+}
+
+.percent-input {
+  width: 40px;
+  border: none;
+  background: transparent;
+  color: #4fc3ff;
+  text-align: center;
 }
 
 /* Date */
@@ -115,13 +126,8 @@ input[type="date"] {
 }
 
 /* Value colors */
-.positive {
-  background: rgba(0,255,100,0.25) !important;
-}
-
-.negative {
-  background: rgba(255,0,0,0.25) !important;
-}
+.positive { background: rgba(0,255,100,0.25) !important; }
+.negative { background: rgba(255,0,0,0.25) !important; }
 
 /* Button */
 .download-btn {
@@ -166,8 +172,8 @@ input[type="date"] {
 
 <tr>
 <td>1</td>
-<td><input id="site" class="auto-input"></td>
-<td><input id="id" class="auto-input"></td>
+<td><input id="site" class="wrap-input"></td>
+<td><input id="id" class="wrap-input"></td>
 <td><input id="settling" class="auto-input" value="0"></td>
 </tr>
 
@@ -261,21 +267,14 @@ document.querySelectorAll("input").forEach(i => {
 
 calc();
 
-/* FIXED EXPORT */
 function downloadImage() {
-  const element = document.getElementById("capture");
-
-  html2canvas(element, {
+  html2canvas(document.getElementById("capture"), {
     scale: 3,
-    backgroundColor: null,
-    scrollX: 0,
-    scrollY: -window.scrollY,
-    windowWidth: document.body.scrollWidth,
-    windowHeight: document.body.scrollHeight
+    backgroundColor: null
   }).then(canvas => {
     let link = document.createElement("a");
     link.download = "sheet.png";
-    link.href = canvas.toDataURL("image/png");
+    link.href = canvas.toDataURL();
     link.click();
   });
 }
