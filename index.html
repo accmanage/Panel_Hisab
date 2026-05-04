@@ -31,21 +31,6 @@ body {
   color: white;
 }
 
-/* Header */
-h3 {
-  text-align: center;
-  font-size: 14px;
-}
-
-h3 input {
-  border: none;
-  background: transparent;
-  color: #4fc3ff;
-  font-weight: bold;
-  text-align: center;
-  width: 90px;
-}
-
 /* Table */
 table {
   width: 100%;
@@ -73,10 +58,9 @@ th {
   background: rgba(255,255,255,0.08);
   color: #4fc3ff;
   font-weight: bold;
-  border-top: 2px solid rgba(79,195,255,0.4);
 }
 
-/* Normal inputs */
+/* Inputs */
 .auto-input {
   width: 100%;
   border: none;
@@ -85,53 +69,35 @@ th {
   text-align: center;
 }
 
-/* ✅ SMART INPUT (SITE & ID) */
+/* TEXTAREA (input mode) */
 .smart-input {
   width: 100%;
-  max-width: 15ch;
-
+  max-width: 13ch;
   border: none;
   background: transparent;
   color: #4fc3ff;
-
   resize: none;
   overflow: hidden;
+  text-align: left;
+}
 
-  white-space: normal;
+/* DISPLAY TEXT (capture mode) */
+.display-text {
+  display: none;
+  white-space: pre-wrap;
   word-break: break-word;
-
+  color: #4fc3ff;
   text-align: left;
   font-weight: 600;
-  line-height: 1.2;
 }
 
-/* Share row */
-.share-row {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
+/* Switch modes */
+.capture-mode textarea {
+  display: none;
 }
-
-.percent-input {
-  width: 40px;
-  border: none;
-  background: transparent;
-  color: #4fc3ff;
-  text-align: center;
+.capture-mode .display-text {
+  display: block;
 }
-
-/* Date */
-input[type="date"] {
-  background: rgba(255,255,255,0.1);
-  border: none;
-  padding: 4px 6px;
-  border-radius: 6px;
-  color: white;
-}
-
-/* Value colors */
-.positive { background: rgba(0,255,100,0.25) !important; }
-.negative { background: rgba(255,0,0,0.25) !important; }
 
 /* Button */
 .download-btn {
@@ -151,13 +117,6 @@ input[type="date"] {
 
 <div class="sheet" id="capture">
 
-<h3>
-  GROUP :
-  <input id="group">
-  |
-  <input id="name">
-</h3>
-
 <table>
 
 <tr>
@@ -176,8 +135,17 @@ input[type="date"] {
 
 <tr>
 <td>1</td>
-<td><textarea id="site" class="smart-input"></textarea></td>
-<td><textarea id="id" class="smart-input"></textarea></td>
+
+<td>
+  <textarea id="siteInput" class="smart-input"></textarea>
+  <div id="siteDisplay" class="display-text"></div>
+</td>
+
+<td>
+  <textarea id="idInput" class="smart-input"></textarea>
+  <div id="idDisplay" class="display-text"></div>
+</td>
+
 <td><input id="settling" class="auto-input" value="0"></td>
 </tr>
 
@@ -194,11 +162,7 @@ input[type="date"] {
 </tr>
 
 <tr>
-<td colspan="3" class="label">
-  <div class="share-row">
-    SHARE @ <input id="percent" class="percent-input" value="">%
-  </div>
-</td>
+<td colspan="3" class="label">SHARE @ 70%</td>
 <td id="share"></td>
 </tr>
 
@@ -229,65 +193,61 @@ input[type="date"] {
 </div>
 
 <script>
-// Auto height for SITE & ID
-function autoHeight(el) {
-  el.style.height = "auto";
-  el.style.height = el.scrollHeight + "px";
+// Sync textarea → display div
+function sync(inputId, displayId) {
+  const input = document.getElementById(inputId);
+  const display = document.getElementById(displayId);
+
+  input.addEventListener("input", () => {
+    display.innerText = input.value;
+
+    input.style.height = "auto";
+    input.style.height = input.scrollHeight + "px";
+  });
 }
 
-["site", "id"].forEach(id => {
-  const el = document.getElementById(id);
-  el.addEventListener("input", () => autoHeight(el));
-});
+sync("siteInput", "siteDisplay");
+sync("idInput", "idDisplay");
 
 // Calculation
-function applyColor(el, value) {
-  let target = el.tagName === "INPUT" ? el.parentElement : el;
-  target.classList.remove("positive", "negative");
-
-  if (value > 0) target.classList.add("positive");
-  else if (value < 0) target.classList.add("negative");
-}
-
 function calc() {
-  let settlingVal = +document.getElementById("settling").value || 0;
-  let holdVal = +document.getElementById("hold").value || 0;
-  let percentVal = +document.getElementById("percent").value || 0;
-  let rcvdVal = +document.getElementById("rcvd").value || 0;
-  let prevVal = +document.getElementById("prev").value || 0;
-  let openingVal = +document.getElementById("opening").value || 0;
+  let settling = +document.getElementById("settling").value || 0;
+  let hold = +document.getElementById("hold").value || 0;
+  let rcvd = +document.getElementById("rcvd").value || 0;
+  let prev = +document.getElementById("prev").value || 0;
+  let opening = +document.getElementById("opening").value || 0;
 
-  let totalVal = settlingVal + holdVal;
-  let shareVal = settlingVal * (percentVal / 100);
-  let finalVal = prevVal + openingVal - rcvdVal + shareVal;
+  let total = settling + hold;
+  let share = settling * 0.7;
+  let final = prev + opening - rcvd + share;
 
-  document.getElementById("total").innerText = totalVal.toFixed(2);
-  document.getElementById("share").innerText = shareVal.toFixed(2);
-  document.getElementById("final").innerText = finalVal.toFixed(2);
-
-  applyColor(document.getElementById("settling"), settlingVal);
-  applyColor(document.getElementById("hold"), holdVal);
-  applyColor(document.getElementById("total"), totalVal);
-  applyColor(document.getElementById("final"), finalVal);
+  document.getElementById("total").innerText = total.toFixed(2);
+  document.getElementById("share").innerText = share.toFixed(2);
+  document.getElementById("final").innerText = final.toFixed(2);
 }
 
-// Bind inputs
 document.querySelectorAll("input").forEach(i => {
   i.addEventListener("input", calc);
 });
 
 calc();
 
-// Download
+// Download as JPEG (NO CUT)
 function downloadImage() {
-  html2canvas(document.getElementById("capture"), {
+  const element = document.getElementById("capture");
+
+  element.classList.add("capture-mode");
+
+  html2canvas(element, {
     scale: 3,
-    backgroundColor: null
+    backgroundColor: "#ffffff"
   }).then(canvas => {
-    let link = document.createElement("a");
-    link.download = "sheet.png";
-    link.href = canvas.toDataURL();
+    const link = document.createElement("a");
+    link.download = "sheet.jpg";
+    link.href = canvas.toDataURL("image/jpeg", 0.95);
     link.click();
+
+    element.classList.remove("capture-mode");
   });
 }
 </script>
