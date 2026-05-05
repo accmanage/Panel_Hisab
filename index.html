@@ -268,6 +268,19 @@ select.input {
     <div id="final" class="value final"></div>
   </div>
 </div>
+<button onclick="submitData()" 
+  style="
+    width:100%;
+    padding:10px;
+    border-radius:10px;
+    background:rgba(0,150,255,0.3);
+    border:1px solid rgba(255,255,255,0.1);
+    color:#22d3ee;
+    font-weight:bold;
+    cursor:pointer;
+  ">
+  SUBMIT
+</button>
 
 </div>
 
@@ -287,7 +300,6 @@ function updateTypeUI(){
   let type = typeEl.value;
 
   if(type === "Franchise"){
-    // show correct rows
     show("row-share");
     hide("row-share1");
 
@@ -300,11 +312,9 @@ function updateTypeUI(){
     hide("row-freeze");
     hide("row-expenses");
 
-    // 🔥 reset OWN share display
     document.getElementById("share1").innerText = "";
 
   } else {
-    // OWN mode
     hide("row-share");
     show("row-share1");
 
@@ -316,11 +326,10 @@ function updateTypeUI(){
     show("row-freeze");
     show("row-expenses");
 
-    // 🔥 reset Franchise share display
     document.getElementById("share").innerText = "";
   }
 
-  calc(); // 🔥 force recalculation after switch
+  calc();
 }
 
 typeEl.addEventListener("change", updateTypeUI);
@@ -334,21 +343,20 @@ function applyColor(el,v){
 function calc(){
   let type = typeEl.value;
 
-  // ✅ CORRECT way (always use getElementById)
   let settlingVal = +document.getElementById("settling").value || 0;
   let holdVal = +document.getElementById("hold").value || 0;
   let percentVal = +document.getElementById("percent").value || 0;
+  let percentVal1 = +document.getElementById("percent1").value || 0;
   let rcvdVal = +document.getElementById("rcvd").value || 0;
   let prevVal = +document.getElementById("prev").value || 0;
   let openingVal = +document.getElementById("opening").value || 0;
   let freezeVal = +document.getElementById("freeze").value || 0;
   let expensesVal = +document.getElementById("expenses").value || 0;
-  let percentVal1 = +document.getElementById("percent1").value || 0;
 
-  
   let share = settlingVal * (percentVal / 100);
   let share1 = settlingVal * (percentVal1 / 100);
   let total = settlingVal - share;
+
   let final;
   if(type === "Franchise"){
     final = total + holdVal - rcvdVal + prevVal + openingVal;
@@ -356,23 +364,24 @@ function calc(){
     final = settlingVal - share1 + holdVal - freezeVal - expensesVal + openingVal;
   }
 
-  // update UI
   totalEl.innerText = total.toFixed(2);
-  if(type === "Franchise"){
-    shareEl.innerText = share.toFixed(2);
-  } else {
-    document.getElementById("share1").innerText = share1.toFixed(2);
-  }
   finalEl.innerText = final.toFixed(2);
 
-  // colors
+  if(type === "Franchise"){
+    shareEl.innerText = share.toFixed(2);
+    applyColor(shareEl, share);
+  } else {
+    let shareOwnEl = document.getElementById("share1");
+    shareOwnEl.innerText = share1.toFixed(2);
+    applyColor(shareOwnEl, share1);
+  }
+
   applyColor(document.getElementById("settling"), settlingVal);
   applyColor(document.getElementById("hold"), holdVal);
   applyColor(totalEl, total);
   applyColor(finalEl, final);
-
-  shareEl.classList.remove("positive","negative");
 }
+
 let totalEl=document.getElementById("total");
 let shareEl=document.getElementById("share");
 let finalEl=document.getElementById("final");
@@ -383,6 +392,52 @@ document.querySelectorAll("input,textarea,select").forEach(i=>{
 
 updateTypeUI();
 calc();
+
+function submitData() {
+  const type = document.getElementById("type").value;
+
+  const data = {
+    group: document.getElementById("group").value,
+    date: document.getElementById("date").value,
+    type: type,
+    site: document.getElementById("site").value,
+    branch: document.getElementById("id").value,
+
+    settling: document.getElementById("settling").value,
+    hold: document.getElementById("hold").value,
+    rcvd: document.getElementById("rcvd").value,
+    prev: document.getElementById("prev").value,
+    opening: document.getElementById("opening").value,
+    freeze: document.getElementById("freeze").value,
+    expenses: document.getElementById("expenses").value,
+
+    total: document.getElementById("total").innerText,
+    final: document.getElementById("final").innerText,
+
+    // pick correct share based on TYPE (no logic change)
+    share: type === "Franchise"
+      ? document.getElementById("share").innerText
+      : document.getElementById("share1").innerText
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycbx_quZ2dab15s4bZs0dAOBCV6BWNk511lHG0j-4TfuEGdpJeisZxwlZmP5IdEUwj4zk/exec", {
+    method: "POST",
+    body: JSON.stringify(data)
+  })
+  .then(res => res.json())
+  .then(() => {
+    alert("Submitted to admin ✅");
+
+    // optional clear
+    document.querySelectorAll("input, textarea").forEach(i => i.value = "");
+    document.getElementById("share").innerText = "";
+    document.getElementById("share1").innerText = "";
+    document.getElementById("total").innerText = "";
+    document.getElementById("final").innerText = "";
+    calc();
+  })
+  .catch(() => alert("Error sending ❌"));
+}
 </script>
 
 </body>
