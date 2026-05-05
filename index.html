@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clean Panel</title>
+<title>Glass Panel</title>
 
 <style>
 * { box-sizing: border-box; }
@@ -11,228 +11,266 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #141e30, #243b55);
+
+  /* 🧊 IMAGE BACKGROUND */
+  background: url('https://images.openai.com/static-rsc-4/GDccpKjdvIZ9H9pmRf7bmjZILQXNMLDirjLOg88UGHL1sUHcFUZ64zz8NhgrwvCVYL4oyPgQK-9-gUB8Ekh92Rbs2l2-eC-E8BGqWxo-_fEkFCokXoAmt51Z9vv5UfUmicP_C36U4rPsJuMiKinB_telvT4THKncYHybMdyEiAqheCw9nEKhYeija3_xWZla?purpose=fullsize') no-repeat center center fixed;
+  background-size: cover;
+
   display: flex;
   justify-content: center;
 }
 
-.sheet {
+/* dark overlay for readability */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: -1;
+}
+
+/* CONTAINER */
+.container {
   width: 95%;
-  max-width: 500px;
-  margin-top: 12px;
-  padding: 12px;
-  border-radius: 18px;
+  max-width: 420px;
+  margin: 10px;
+}
+
+/* GLASS CARD */
+.card {
+  border-radius: 16px;
+  padding: 10px;
+  margin-bottom: 8px;
+
   background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 10px 35px rgba(0,150,255,0.25);
-  color: white;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+
+  color: #e5e7eb;
 }
 
-/* 🔥 HEADER FIX ONLY */
-h3 {
+/* HEADER */
+.header {
   text-align: center;
-  font-size: 14px;
-  margin-bottom: 10px;
-}
-
-.header-input {
-  width: 90px; /* fixed width */
-  border: none;
-  background: transparent;
-  color: #4fc3ff;
-  text-align: center;
+  font-size: 13px;
   font-weight: bold;
-  outline: none;
-}
-#date {
-  border: none;
-  background: rgba(255,255,255,0.08);
-  color: #4fc3ff;
-  padding: 4px 6px;
-  border-radius: 6px;
-  font-size: 12px;
-  outline: none;
+  color: #22d3ee;
 }
 
-/* cells */
-td, th {
-  border: 1px solid rgba(255,255,255,0.15);
-  padding: 6px;
-  font-size: 12px;
-  text-align: center;
+/* ROW */
+.row {
+  display: flex;
+  align-items: center;
+  margin: 6px 0;
 }
 
-th {
-  background: rgba(0,150,255,0.2);
-  color: #4fc3ff;
-}
-
+/* LABEL */
 .label {
-  background: rgba(255,255,255,0.08);
-  font-weight: bold;
+  width: 50%;
+  font-size: 15px;
+  color: #fcfdff;
+  padding-left: 10px;
+}
+.label1 {
+  width: 50%;
+  font-size: 18px;
+  color: #fcfdff;
+  padding-left: 30px;
 }
 
-.final {
-  background: rgba(255,255,255,0.08);
-  color: #4fc3ff;
-  font-weight: bold;
-}
-
-/* inputs */
-.auto-input {
-  width: 100%;
+/* INPUT */
+.input {
+  width: 50%;
   border: none;
-  background: transparent;
-  color: #4fc3ff;
-  text-align: center;
-}
+  outline: none;
 
-.percent-box {
-  width: 45px;
-  border: none;
-  background: transparent;
-  color: #4fc3ff;
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  padding: 6px;
+
+  color: #22d3ee;
   text-align: center;
+
+  border: 1px solid rgba(255,255,255,0.05);
+  font-size: 13px;
+
+  text-transform: uppercase;
 }
 
 /* TEXTAREA */
-.smart-input {
-  width: 100%;
+.textarea {
+  width: 50%;
+  he
   border: none;
-  background: transparent;
-  color: #4fc3ff;
+  outline: none;
+
+  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+  padding: 6px;
+  text-align: center;
+  color: #22d3ee;
+
+  border: 1px solid rgba(255,255,255,0.05);
 
   resize: none;
-  overflow: hidden;
+  font-size: 13px;
 
-  text-align: left;
-
-  white-space: pre-wrap;      /* ✅ allow wrapping */
-  word-break: break-word;     /* ✅ break long text */
-  overflow-wrap: break-word;  /* ✅ clean wrap */
-
-  font-size: 12px;
+  text-transform: uppercase;
 }
 
-/* colors */
+/* VALUE */
+.value {
+  width: 50%;
+  padding: 6px;
+  border-radius: 8px;
+  text-align: center;
+
+  background: rgba(255,255,255,0.03);
+
+  border: 1px solid rgba(255,255,255,0.05);
+
+  color: #22d3ee;
+  font-size: 13px;
+}
+
+/* POSITIVE */
 .positive {
-  background: rgba(0,255,100,0.25) !important;
+  background: rgba(0,255,120,0.12);
+  border: 1px solid rgba(0,255,120,0.5);
+  box-shadow: 0 0 8px rgba(0,255,120,0.5);
+  color: #00ff9c;
 }
 
+/* NEGATIVE */
 .negative {
-  background: rgba(255,0,0,0.25) !important;
+  background: rgba(255,0,0,0.12);
+  border: 1px solid rgba(255,0,0,0.5);
+  box-shadow: 0 0 8px rgba(255,0,0,0.5);
+  color: #ff4d4d;
 }
+
+/* FINAL */
+.final {
+  font-size: 15px;
+  font-weight: bold;
+  color: #38bdf8;
+}
+#date {
+  width: 80% !important;
+}
+#site {
+  width: 80% !important;
+}
+#id {
+  width: 80% !important;
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="sheet">
+<div class="container">
 
-<h3>
-  GROUP :
-  <input id="group" class="header-input" value="">
-  |
-  <input id="name" class="header-input" value="">
-</h3>
+<div class="card header">
+  GROUP  
+  <input id="group" class="input">
+</div>
 
-<table>
-<colgroup>
-  <col style="width:5%">   <!-- SR -->
-  <col style="width:32%">  <!-- SITE -->
-  <col style="width:32%">  <!-- ID -->
-  <col style="width:31%">  <!-- SETTLING -->
-</colgroup>
-<tr>
-<td colspan="4" style="text-align:right;">
-  DATE :
-  <input type="date" id="date">
-</td>
-</tr>
+<div class="card">
+  <div class="row">
+    <div class="label1">DATE</div>
+    <input type="date" id="date" class="input" style="text-transform:none;">
+  </div>
+</div>
 
-<tr>
-<th>SR</th>
-<th>SITE</th>
-<th>ID</th>
-<th>SETTLING</th>
-</tr>
+<div class="card">
+  <div class="row">
+    <div class="label1">SITE</div>
+    <textarea id="site" class="textarea"></textarea>
+  </div>
 
-<tr>
-<td>1</td>
-<td><textarea id="site" class="smart-input"></textarea></td>
-<td><textarea id="id" class="smart-input"></textarea></td>
-<td><input id="settling" class="auto-input" value="0"></td>
-</tr>
+  <div class="row">
+    <div class="label1">ID</div>
+    <textarea id="id" class="textarea"></textarea>
+  </div>
+</div>
 
-<tr><td colspan="4"></td></tr>
+<div class="card">
+  <div class="row">
+    <div class="label">SETTLING</div>
+    <input id="settling" class="input" value="0">
+  </div>
 
-<tr>
-<td colspan="3" class="label">HOLD BALANCE</td>
-<td><input id="hold" class="auto-input" value="0"></td>
-</tr>
+  <div class="row">
+    <div class="label">HOLD BALANCE</div>
+    <input id="hold" class="input" value="0">
+  </div>
 
-<tr>
-<td colspan="3" class="label">TOTAL</td>
-<td id="total"></td>
-</tr>
+  <div class="row">
+    <div class="label">TOTAL BALANCE</div>
+    <div id="total" class="value"></div>
+  </div>
 
-<tr>
-<td colspan="3" class="label">
-  OUR SHARE @ 
-  <input id="percent" class="percent-box" value="0">%
-</td>
-<td id="share"></td>
-</tr>
+  <div class="row">
+    <div class="label">
+      SHARE @ <input id="percent" class="input" style="width:60px;" value="0">%
+    </div>
+    <div id="share" class="value"></div>
+  </div>
 
-<tr>
-<td colspan="3" class="label">RECEIVED THIS WEEK</td>
-<td><input id="rcvd" class="auto-input" value="0"></td>
-</tr>
+  <div class="row">
+    <div class="label">RECEIVED THIS WEEK</div>
+    <input id="rcvd" class="input" value="0">
+  </div>
 
-<tr>
-<td colspan="3" class="label">PREVIOUS BALANCE</td>
-<td><input id="prev" class="auto-input" value="0"></td>
-</tr>
+  <div class="row">
+    <div class="label">PREVIOUS BALANCE</div>
+    <input id="prev" class="input" value="0">
+  </div>
 
-<tr>
-<td colspan="3" class="label">OPENING PUNTER BALANCE</td>
-<td><input id="opening" class="auto-input" value="0"></td>
-</tr>
+  <div class="row">
+    <div class="label">OPENING PUNTER BALANCE</div>
+    <input id="opening" class="input" value="0">
+  </div>
 
-<tr>
-<td colspan="3" class="final">FINAL</td>
-<td class="final" id="final"></td>
-</tr>
+</div>
 
-</table>
+<div class="card">
+  <div class="row final">
+    <div class="label">FINAL</div>
+    <div id="final" class="value final"></div>
+  </div>
+</div>
 
 </div>
 
 <script>
-// Color helper
+// AUTO CAPITALIZE
+["group", "site", "id"].forEach(id => {
+  let el = document.getElementById(id);
+  el.addEventListener("input", () => {
+    el.value = el.value.toUpperCase();
+  });
+});
+
 function applyColor(el, value) {
-  let target = el.tagName === "INPUT" ? el.parentElement : el;
-
-  target.classList.remove("positive", "negative");
-
-  if (value > 0) target.classList.add("positive");
-  else if (value < 0) target.classList.add("negative");
+  el.classList.remove("positive", "negative");
+  if (value > 0) el.classList.add("positive");
+  else if (value < 0) el.classList.add("negative");
 }
 
-// Calculation
 function calc() {
-  let settlingEl = document.getElementById("settling");
-  let holdEl = document.getElementById("hold");
-  let totalEl = document.getElementById("total");
-  let finalEl = document.getElementById("final");
-  let shareEl = document.getElementById("share");
-
   let settling = +settlingEl.value || 0;
   let hold = +holdEl.value || 0;
-  let percent = +document.getElementById("percent").value || 0;
-  let rcvd = +document.getElementById("rcvd").value || 0;
-  let prev = +document.getElementById("prev").value || 0;
-  let opening = +document.getElementById("opening").value || 0;
+  let percent = +percentEl.value || 0;
+  let rcvd = +rcvdEl.value || 0;
+  let prev = +prevEl.value || 0;
+  let opening = +openingEl.value || 0;
 
   let total = settling + hold;
   let share = settling * (percent / 100);
@@ -246,10 +284,22 @@ function calc() {
   applyColor(holdEl, hold);
   applyColor(totalEl, total);
   applyColor(finalEl, final);
+
+  shareEl.classList.remove("positive", "negative");
 }
 
-// Bind inputs
-document.querySelectorAll("input").forEach(i => {
+let settlingEl = document.getElementById("settling");
+let holdEl = document.getElementById("hold");
+let percentEl = document.getElementById("percent");
+let rcvdEl = document.getElementById("rcvd");
+let prevEl = document.getElementById("prev");
+let openingEl = document.getElementById("opening");
+
+let totalEl = document.getElementById("total");
+let shareEl = document.getElementById("share");
+let finalEl = document.getElementById("final");
+
+document.querySelectorAll("input, textarea").forEach(i => {
   i.addEventListener("input", calc);
 });
 
