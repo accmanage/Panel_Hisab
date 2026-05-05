@@ -310,7 +310,7 @@ function updateTypeUI(){
     hide("row-total");
     hide("row-rcvd");
     hide("row-prev");
-    hide("row-opening");
+    show("row-opening");
 
     show("row-freeze");
     show("row-expenses");
@@ -352,7 +352,7 @@ function calc(){
   if(type === "Franchise"){
     final = total + holdVal - rcvdVal + prevVal + openingVal;
   } else {
-    final = settlingVal - share1 + holdVal - freezeVal - expensesVal;
+    final = settlingVal - share1 + holdVal - freezeVal - expensesVal + openingVal;
   }
 
   // update UI
