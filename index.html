@@ -414,7 +414,6 @@ function submitData() {
     total: document.getElementById("total").innerText,
     final: document.getElementById("final").innerText,
 
-    // pick correct share based on TYPE (no logic change)
     share: type === "Franchise"
       ? document.getElementById("share").innerText
       : document.getElementById("share1").innerText
@@ -422,21 +421,13 @@ function submitData() {
 
   fetch("https://script.google.com/macros/s/AKfycbx_quZ2dab15s4bZs0dAOBCV6BWNk511lHG0j-4TfuEGdpJeisZxwlZmP5IdEUwj4zk/exec", {
     method: "POST",
-    body: JSON.stringify(data)
+    body: new URLSearchParams(data) // 🔥 key fix
   })
-  .then(res => res.json())
-  .then(() => {
-    alert("Submitted to admin ✅");
-
-    // optional clear
-    document.querySelectorAll("input, textarea").forEach(i => i.value = "");
-    document.getElementById("share").innerText = "";
-    document.getElementById("share1").innerText = "";
-    document.getElementById("total").innerText = "";
-    document.getElementById("final").innerText = "";
-    calc();
-  })
-  .catch(() => alert("Error sending ❌"));
+  .then(() => alert("Submitted to admin ✅"))
+  .catch(err => {
+    console.error(err);
+    alert("Error ❌");
+  });
 }
 </script>
 
